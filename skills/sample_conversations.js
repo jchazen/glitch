@@ -25,6 +25,7 @@ const RADIUS = 30; // number of miles away from targetFriend that google maps sh
 // BEGINNING OF CONVO
 module.exports = function(controller) {
   // Bot listens for "meet", then requests a time to meet up.
+  // merge into "friends/group"
   controller.hears('meet', 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
       console.log('  Before asking time');
@@ -61,7 +62,7 @@ module.exports = function(controller) {
                 // Bot asks user if inputted information is correct. If not, redo; if so, 
                 convo4.ask('Ok. So you want to meet on ' + date + ' at ' + time + ampm + '. Is this correct?', function(response5, convo5){
                   // COMPARES response5.text as "yes" or "no" to determine if location should be sent
-                  if(response5.text == 'yes'){
+                  if(isEqualIgnoreCase(response5.text, 'yes') || isEqualIgnoreCase(response5.text, 'correct')){
                     convo5.say('Great! I\'ll let you know which places you and your group should meet at soon!' +
                       'Type \'occasion\' to specify the type of location you want to go to.');
                     // location shit
@@ -82,6 +83,7 @@ module.exports = function(controller) {
   });
 
   // Bot listens for the string "occasion" and sets the occasion of the event
+  // merge into "friends/group"
   controller.hears('occasion', 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
       // Bot asks user for occasion. If user not sure, prompt 'other'
@@ -135,7 +137,7 @@ module.exports = function(controller) {
   });
 
   // Bot listens for the string "find" and prompts the user to input the name of the person planning the event
-  // Find is for non-meetup-creators
+  // Find is for non-meetup creators
   controller.hears('find', function(bot, message){
     bot.startConversation(message, function(err, convo){
       convo.ask('Which person created the plan?', function(response, convo1){
@@ -404,7 +406,7 @@ function makeFakePersons(){
     },
     p2: {
       name: 'Michael',
-      sum: 2.7, //1+0.7+1.0,
+      sum: 2.7, //1.0+0.7+1.0,
       lat: 32.873969,
       lon: -117.242955
     },
@@ -416,7 +418,7 @@ function makeFakePersons(){
     },
     p4: {
       name: 'Caitlyn',
-      sum: 2.5, //1+0.8+0.7,
+      sum: 2.5, //1.0+0.8+0.7,
       lat: 32.886089, 
       lon: -117.242760
     }
