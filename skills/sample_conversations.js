@@ -93,7 +93,7 @@ module.exports = function(controller) {
             occasion = response1.text;
         if(isEqual(occasion, 'A boring one'))
           occasion = 'other';
-        convo1.say('You have chosen an occasion of ' + occasion + '. If this is correct, type \"friends\" or \"group\" to '
+        convo1.say('You have chosen an occasion of ' + occasion + '. If this is correct, type \"friend\" or \"group\" to '
           + 'add other people to your plan. Otherwise, type \"occasion\" to choose another occasion.');
         convo1.next();
       });
@@ -102,7 +102,7 @@ module.exports = function(controller) {
   });
   
   // This block listens for the strings "fruit" and "fruits"
-  controller.hears(['fruit', 'fruits'], 'message_received', function(bot, message) {
+  controller.hears('fruit', 'message_received', function(bot, message) {
     bot.startConversation(message, function(err, convo) {
       // Asks the user a question
       convo.ask('Which do you like the best out of apple, orange, and banana?', function(response1, convo1) {
@@ -178,9 +178,9 @@ module.exports = function(controller) {
     });
   });
 
-  // Bot listens for the string "friends" or "group" and prompts the user to input a list of people separated by commas and spaces
+  // Bot listens for the string "friend" or "group" and prompts the user to input a list of people separated by commas and spaces
   // Friends/Group is for meetup creators
-  controller.hears(['friends', 'group'], function(bot, message){
+  controller.hears(['friend', 'group'], function(bot, message){
     bot.startConversation(message, function(err, convo){
       // TODO: (later) fix how to add friends
       // Bot asks user to add friends/group members to the MeetUp plan
