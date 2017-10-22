@@ -217,7 +217,7 @@ module.exports = function(controller) {
   });
 
   // TEST Bot listens for the string "friends" or "group" and prompts the user to input a list of people separated by commas and spaces
-  controller.hears(['testfriends', 'testgroup'], function(bot, message){
+  controller.hears(['tests'], function(bot, message){
     bot.startConversation(message, function(err, convo){
       // Bot asks user to add friends/group members to the MeetUp plan
       convo.ask('Who would you like to meet up with? (separate names by a comma and space: \"John, Alexa, Gary\")', function(whoresp, whoconvo){
@@ -245,7 +245,23 @@ module.exports = function(controller) {
       }
       */
       targetFriend = findMinPerson(PERSONS);
-      //places_suggestions.
+      bot.reply(message, {
+        attachment: {
+          'type':'template',
+          'payload': {
+            'template_type':'generic',
+            'elements': [{
+              'title':'MeetUp here!',
+              'image_url':'http://www.jqueryscript.net/images/Show-Nearby-Places-jQuery-Google-Maps-WhatsNearby.jpg',
+              'buttons': [{
+                'type':'web_url',
+                'url':'https://www.google.com/maps/search/movie+theaters/@28.354177,-81.6731525,11z/data=!3m1!4b1',
+                'title':'View Map'
+              }]
+            }]
+          }
+        }
+      });
     });
   });
 }
