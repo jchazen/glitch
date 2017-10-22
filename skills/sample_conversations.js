@@ -4,63 +4,67 @@ In this document, Botkit hears a keyword, then responds. Different paths
 through the conversation are chosen based on the user's response.
 
 */
-var sum = 0;
+var gotValidTime = false; // Stores whether a valid time was input
+var gotValidAMPM = false; // Stores whether a valid am/pm has been input
+var time = 'Not a time'; // stores the given time
+var date = 'Not a date'; // stores the current date
+var ampm = 'Not a morning person'; // stores morning or evening state
 
 module.exports = function(controller) {
-  // Bot listens for "meet". Then requests a time to meet up.
+  // Bot listens for "meet", then requests a time to meet up.
   controller.hears(['meet', 'meeting'], 'message_received', function(bot, message){
-    var gotValidTime = false; // Stores whether a valid time was input
-    var gotValidAMPM = false; // Stores whether a valid am/pm has been input
     bot.startConversation(message, function(err, convo){
-      var time = 'Not a time'; // stores the given time
-      var date = 'MM/DD/YYYY'; // stores the current date
-      var ampm = 'Not a morning person'; // stores morning or evening state
       console.log('  Before asking time');
       // Bot requests time to meet up. If time is not correctly formatted, it will request the time once more
-      //while(!gotValidTime){
-        if(sum++ < 10)
-          console.log('In while loop');
-        convo.ask('What time?', function(response2, convo2){
-          console.log('  Before if statement');
-          if(followsTimeFormat(response2.text, '12:60')
-            || (isNumber(response2.text) && parseInt(response2.text) <= 12 && parseInt(response2.text) >= 0)){
-            time = response2.text;
-            gotValidTime = true;
-            console.log('  If statement true, time is valid: ' + time);
-          } else {
-            console.log('  Error: ' + response2.text + ' is not a valid time');
-            convo2.say('Uh oh, that\'s not a valid time! Type \"meet\" again to re-plan.');
-          }
-          console.log('  Got to this point: exited if statement');
-          convo2.next();
-        });
-        gotValidTime = (sum>100);
-      //}
-      console.log('Sum: ' + sum);
-      // Bot requests AM or PM. If invalid input, it will request AMPM once more
-      convo.ask('AM or PM?', function(response3, convo3){
-        if(isEqual(response3.text, 'PM'))
-          ampm = 'PM';
-        else if(isEqual(response3.text, 'AM'))
-          ampm = 'AM';
-        else{
-          convo3.say('Invalid time setting. Automatically setting AM...');
-          ampm = 'AM';
+      convo.ask('What time?', function(response2, convo2){
+        console.log('  Before if statement');
+        // COMPARES response2.text to determine time
+        if(followsTimeFormat(response2.text, '12:60') || (isNumber(response2.text) && parseInt(response2.text) <= 12 && parseInt(response2.text) >= 0)){
+          time = response2.text;
+          console.log('  TIME If statement true, time is valid: ' + time);
+          // Bot requests AM or PM. If invalid input, it will request AMPM once more
+          convo2.ask('AM or PM?', function(response3, convo3){
+            // COMPARES response3.text to determine AMPM setting
+            if(isEqual(response3.text, 'PM'))
+              ampm = 'PM';
+            else if(isEqual(response3.text, 'AM'))
+              ampm = 'AM';
+            else{
+              convo3.say('Invalid time setting. Automatically setting to AM...');
+              ampm = 'AM';
+            }
+            console.log('  AMPM: ' + ampm);
+            // Bot requests date if AMPM is correct. If invalid input, it will request date once more
+            if(isEqual(ampm, 'AM') || isEqual(ampm, 'PM')){
+              convo3.ask('What date do you want to meet up? (MM/DD/YYYY)', function(response4, convo4){
+                console.log('  Inside date request');
+                // COMPARES response4.text to determine date
+                if(followsDateFormat(response4.text, '12/31/9999')){
+                  date = response4.text;
+                  console.log('  DATE If statement true, date is valid: ' + date);
+                } else {
+                  convo4.say()
+                }
+                // Bot asks user if inputted information is correct. If not, redo; if so, 
+                convo4.ask('Ok. So you want to meet on this date ' + date + ', at this time ' + time + ampm + '. Is this correct?', function(response5, convo5){
+                  // COMPARES response5.text as "yes" or "no" to determine if location should be sent
+                  if(response5.text == 'yes'){
+                    convo5.say('Great! I\'ll let you know which places you and your group should meet at soon!');
+                    // location shit
+                  } else
+                    convo5.say('Oh no! Type \'meet\' again to re-plan your session.');
+                  convo5.next();
+                });
+                convo4.next();
+              });
+            };
+            convo3.next();
+          });
         }
-        console.log('ampm: ' + ampm);
-        convo3.next();
+        convo2.next();
       });
-      // Bot requests date if AMPM is correct. If invalid input, it will request date once more
-      if(isEqual(ampm, 'AM') || isEqual(ampm, 'PM')){
-        convo.say('Great, you want to meet up at ' + time + ampm + '!');
-        convo.ask('What date do you want to meet up? (MM/DD/YYYY)', function(response4, convo4){
-          console.log('  Inside date request');
-          convo4.say('lmaos');
-          convo4.next();
-        });
-        convo.next();
-      };
     });
+    convo.next();
   });
   
   // This block listens for the strings "fruit" and "fruits"
@@ -100,6 +104,18 @@ module.exports = function(controller) {
   
   // A function that checks if the string follows a time format.
   // The colon : is the delimiter. The string must have a colon separating integers.
+  function followsTimeFormat(str, formatStr){
+    var strs = str.split(':'), formatStrs = str.split(':');
+    if(strs.length != formatStrs.length)
+      return false;
+    for(var i = 0; i < strs.length; i++)
+      if(parseInt(strs[i]) > parseInt(formatStrs[i]))
+        return false;
+    return true;
+  }
+
+  // A function that checks if the string follows a date format.
+  // The slash / is the delimiter. The string must have two slashes separating integers.
   function followsTimeFormat(str, formatStr){
     var strs = str.split(':'), formatStrs = str.split(':');
     if(strs.length != formatStrs.length)
