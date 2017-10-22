@@ -72,6 +72,8 @@ module.exports = function(controller) {
     bot.startConversation(message, function(err, convo) {
       console.log('  Comparing \'a string\' and \'a string\': ' + isEqual('a string', 'a string'));
       console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
+      console.log('  Comparing \'a string\' and \'a string\': ' + isIdentical('a string', 'a string'));
+      console.log('  Comparing \'a string\' and \'another string\': ' + isIdentical('a string', 'another string'));
       console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualString('a string', 'a string'));
       console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualString('a string', 'another string'));
       console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualStringIgnoreCase('a string', 'a string'));
@@ -146,19 +148,20 @@ module.exports = function(controller) {
   function isEqual(str1, str2){
     return str1 == str2;
   }
+
+  // A function that tests if two strings are identical
+  function isIdentical(str1, str2){
+    return str1 === str2;
+  }
   
   // A function that tests if two String objects are equal
   function isEqualString(str1, str2){
-    var string1 = new String(str1);
-    var string2 = new String(str2);
-    return string1.equals(string2);
+    return str1.equals(str2);
   }
 
   // A function that tests if two String objects are equal, regardless of case
   function isEqualStringIgnoreCase(str1, str2){
-    var string1 = new String(str1);
-    var string2 = new String(str2);
-    return string1.equalsIgnoreCase(string2);
+    return str1.equalsIgnoreCase(str2);
   }
 
 };
