@@ -1,67 +1,54 @@
 /*
 
 Botkit Studio Skill module to enhance the "send location" script
-
+NEW?
 */
 
 
-
- function getLoc(x,y) {
-    var coord = new coord(x, y);
-    return coord;
-  }
+//var database = new Store('./my-folder/dataBB.json');
 
 module.exports = function(controller) {
-  var loc
   
- 
+var Store = require("jfs");
+var db = new Store("./my-folder/datab.json");
+
+  
    // listen for the phrase `shirt` and reply back with structured messages
   // containing images, links and action buttons
   controller.hears(['let\'s go!', 'leggo'],'message_received',function(bot, message) 
   {
-    
-    bot.createConversation(message, function(err, convo){
+    //start conversation after hearing key word
+    bot.startConversation(message, function(err, convo){
       convo.addQuestion({
         text:"Where are you?",
         quick_replies:[{
-          "content_type":"location",
+          "content_type":"location",      // asks user to send location
         }]
       }, function(response, convo){
+         
+        //parsing laditude and longitude based on user location
         var obj = {
-          lat: response.attachments[0].payload.coordinates.lat,
-          lon: response.attachments[0].payload.coordinates.long
+        lat: response.attachments[0].payload.coordinates.lat,
+        lon: response.attachments[0].payload.coordinates.long
         }
-        response.text = JSON.stringify(obj);
-        convo.next();
+        console.log("Looks like user " + message.user + " is at: "+ JSON.stringify(obj));
+
+        //if message.user found in file, delete
+        var o = db.get(message.user)
+        if(o !== null) db.delete(message.user);
+        //writing data to json file
+        db.save(message.user, JSON.stringify(obj));
+        
+        bot.reply(message, "You are at "+ obj.lat + " " +obj.lon);
+        bot.reply(message, "Let's explore!")
+        
       },{key: 'location'}, 'default');
 
-      convo.activate();
-
-      convo.on('end', function(convo) {
-        
-        if (convo.successful()) {
-          var data = convo.extractResponses();
-          data.location = JSON.parse(data.location);
-          loc = {
-            lat: data.location.lat,
-            lon: data.location.lon
-          }
-          bot.reply(message, "You are at "+ loc.lat+ " " + loc.lon);
-          
-        }
-        else {
-          console.log("convo not sucessful");
-        }
-         console.log(loc.lat + " " + loc.lon);
-      });
     });
+    
   });
   
-  
-  
-  
-  
-  
-  
-  
-}
+  //controller.hears('i\'m hungry')
+
+ 
+  };
