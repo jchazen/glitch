@@ -15,12 +15,17 @@ const OCCASIONS = ['business', 'coffee', 'educational', 'family', 'food', 'meet 
 var lat = 0; // stores the latitude of the person
 var lon = 0; // stores the longitude of the person
 const AGREEMENTS = ['fill this out plz', 'yes', 'yeah', 'yea', 'y', 'mmhm']; // list of ways people can agree to something
-const FRIENDS = []; // list of friends. empty on init
+var FRIENDS = []; // list of friends. empty on init
+var friendsRSVP = 0; // number of friends who have RSVP'd
+var PERSONS = []; // list of people going to meet up. independent of user
+var person; // the current person
+var targetFriend; // person who made the plan first
+const RADIUS = 30; // number of miles away from targetFriend that google maps should search for places
 
 // BEGINNING OF CONVO
 module.exports = function(controller) {
   // Bot listens for "meet", then requests a time to meet up.
-  controller.hears(['meet', 'meeting'], 'message_received', function(bot, message){
+  controller.hears('meet', 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
       console.log('  Before asking time');
       // Bot requests time to meet up. If time is not correctly formatted, it will request the time once more
@@ -129,24 +134,59 @@ module.exports = function(controller) {
     });
   });
 
+  // Bot listens for the string "find" and prompts the user to input the name of the person planning the event
+  // Find is for non-meetup-creators
+  controller.hears('find', function(bot, message){
+    bot.startConversation(message, function(err, convo){
+      convo.ask('Which person created the plan?', function(response, convo1){
+        if(friendsRSVP == FRIENDS.length){
+          convo1.say('That group is full already.');
+        } else {
+          for(var i = 0; i < FRIENDS.length; i++){
+            if(isEqualIgnoreCase(response.text, FRIENDS[i])){
+              convo1.ask('You have selected ' + response.text + '\'s group. Join (and send location) or cancel?', new function(response2, convo2){
+                if(isEqualIgnoreCase(response2.text, 'join')){
+                  friendsRSVP++;
+                  convo2.addQuestion({
+                    text: "Could you send me your location please?", 
+                    quick_replies:[{ "content_type": "location", }]
+                  }, function(response, convo){
+                    // location temporarily stores the lat/lon of the user
+                    var location = {
+                      lat: response.attachments[0].payload.coordinates.lat,
+                      lon: response.attachments[0].payload.coordinates.long
+                    };
+                    person = makePerson(message.user.name, location.lat, location.lon);
+                    console.log(message.user);
+                    PERSONS.push(person);
+                  });
+                } else if(isEqualIgnoreCase(response2.text, 'cancel')){
+                  convo2.say('Sorry to hear that. Have a good one!');
+                  FRIENDS = removePerson(person, FRIENDS);
+                } else
+                  convo2.say('Unrecognized response. Please type \'find\' again to find your group, or \'meetup\' to create your own plan.');
+                convo2.next();
+              });
+            }
+          }
+        }
+        convo1.next();
+      });
+      convo.next();
+    });
+  });
+
   // Bot listens for the string "friends" or "group" and prompts the user to input a list of people separated by commas and spaces
+  // Friends/Group is for meetup creators
   controller.hears(['friends', 'group'], function(bot, message){
     bot.startConversation(message, function(err, convo){
-      /* //COMMENTED OUT BECAUSE FUNCTIONALITY ALREADY ENABLED: SEE TOP. ALSO THERE IS A COMMENTED-OUT "});" AT THE BOTTOM; IT BELONGS TO THIS CHUNK
-      convo.ask('Would you like to meet up?', function(meetupresp, meetupconvo){
-        for(var yes in AGREEMENTS) // TODO: write AGREEMENTS
-          if(isEqualIgnoreCase(meetupresp.text, yes))
-            convo.say('Great!');
-      */
+      // TODO: (later) fix how to add friends
       // Bot asks user to add friends/group members to the MeetUp plan
       convo.ask('Who would you like to meet up with? (separate names by a comma and space: \"John, Alexa, Gary\")', function(whoresp, whoconvo){
         FRIENDS = whoresp.split(', ');
+        // need to message all friends who are in this plan: this needs subscription
+        whoresp.next();
       });
-      /* //COMMENTED OUT BECAUSE FUNCTIONALITY ALREADY ENABLED: SEE LINE 80ISH.
-      convo.ask('What kind of place would you like to meet up?', function(occasresp, occasconvo){
-        var place = occasresp;
-      });
-      */
       convo.addQuestion({
         text: "Could you send me your location please?", 
         quick_replies:[{ "content_type": "location", }]
@@ -156,25 +196,59 @@ module.exports = function(controller) {
           lat: response.attachments[0].payload.coordinates.lat,
           lon: response.attachments[0].payload.coordinates.long
         };
-        var person = makePerson(message.user, location.lat, location.lon);
+        person = makePerson(message.user.name, location.lat, location.lon);
         PERSONS.push(person);
-        //while
-        //function for adding other people
-        //waits to proceed until all friends have responded or some time has passed (1 hr?)
-        // TODO: IMPLEMENT THE ABOVE
       });
-      // could use a for loop on this stuff
+      // Determines whether a plan is full if both arrays are the same size
+      function isPlanFull(PPL, FRNZ){
+        return PPL.length == FRNZ.length + 1;
+      }
+      if(isPlanFull(PERSONS, FRIENDS)){
+        // could use a for loop on this stuff
+        var index = 0;
+        while(index < PERSONS.length - 1){
+          PERSONS[index].sum = findSum(PERSONS[index], PERSONS);
+          index++;
+        }
+        targetFriend = findMinPerson(PERSONS);
+        // TODO:  Send each person the map given the RADIUS and targetFriend
+      }
+    });
+  });
+
+  // TEST Bot listens for the string "friends" or "group" and prompts the user to input a list of people separated by commas and spaces
+  controller.hears(['testfriends', 'testgroup'], function(bot, message){
+    bot.startConversation(message, function(err, convo){
+      // Bot asks user to add friends/group members to the MeetUp plan
+      convo.ask('Who would you like to meet up with? (separate names by a comma and space: \"John, Alexa, Gary\")', function(whoresp, whoconvo){
+        FRIENDS = ['Jacob', 'Michael', 'Tiffany', 'Caitlyn'];
+        whoresp.next();
+      });
+      convo.addQuestion({
+        text: "Could you send me your location please?", 
+        quick_replies:[{ "content_type": "location", }]
+      }, function(response, convo){
+        // location temporarily stores the lat/lon of the user
+        var location = {
+          lat: response.attachments[0].payload.coordinates.lat,
+          lon: response.attachments[0].payload.coordinates.long
+        };
+        person = makePerson(message.user.name, location.lat, location.lon);
+        PERSONS = makeFakePersons();
+        PERSONS.push(person);
+      });
+      /*
       var index = 0;
-      while(index < FRIENDS.length - 1){
+      while(index < PERSONS.length - 1){
         PERSONS[index].sum = findSum(PERSONS[index], PERSONS);
         index++;
       }
-      var targetFriend = findMinPerson(PERSONS);
-      // TODO: ADD MORE CODE
+      */
+      targetFriend = findMinPerson(PERSONS);
+      //places_suggestions.
     });
   });
-  //});
-  
+
   // A function that checks if the string follows a time format.
   // The colon : is the delimiter. The string must have a colon separating integers.
   function followsTimeFormat(str, formatStr){
@@ -223,13 +297,14 @@ module.exports = function(controller) {
 // ALL OF THE BELOW CODE DEFINES THE PERSON SPECS
 
 //module.exports = function(controller){};
-var PERSONS;
+/*
 var Person = {
-  name: "",
-  sum: 0,
-  lat: null,
-  long: null
+  name: "", // The name of the person
+  sum: 0, // The aggregate distance between this person and everyone else
+  lat: null, // Latitude
+  lon: null // Longitude
 }
+*/
 
 // Returns the linear distance between p1 and p2
 function linDistance(p1, p2){
@@ -270,7 +345,7 @@ function findSum(target, group){
   return sum;
 };
 
-// Returns the person with the smallest sum in the group
+// Returns the person with the smallest sum in the group and sorts group in ascending order
 function findMinPerson(group){
   var position = 0;
   var minPerson = group[0];
@@ -290,9 +365,52 @@ function findMinPerson(group){
   return minPerson;
 };
 
+// Returns an array without the person that was just removed
+function removePerson(name, group){
+  var temp = group[0];
+  for(var i = 1; i < group.length; i++){
+    if(isEqual(group[i], name)){
+      group[i] = temp;
+      group[0] = name;
+    }
+  }
+  group.shift();
+  return group;
+}
+
 // Returns whether the two persons are the same
 function equals(p1, p2){
   if(p1.name == p2.name && p1.long == p2.long && p2.lat == p2.lat)
     return true;
   return false;
+}
+
+// TESTING PURPOSES ONLY: Creates a fully initialized dummy person array
+function makeFakePersons(){
+  return {
+    p1: {
+      name: 'Jacob',
+      sum: 2.1, //0.8+0.3+1.0,
+      lat: 32.881794,
+      lon: -117.233410
+    },
+    p2: {
+      name: 'Michael',
+      sum: 2.7, //1+0.7+1.0,
+      lat: 32.873969,
+      lon: -117.242955
+    },
+    p3: {
+      name: 'Tiffany',
+      sum: 1.7, //0.7+0.3+0.7,
+      lat: 32.881122,
+      lon: -117.237604
+    },
+    p4: {
+      name: 'Caitlyn',
+      sum: 2.5, //1+0.8+0.7,
+      lat: 32.886089, 
+      lon: -117.242760
+    }
+  };
 }
