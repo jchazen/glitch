@@ -63,8 +63,8 @@ module.exports = function(controller) {
         }
         convo2.next();
       });
+      convo.next();
     });
-    convo.next();
   });
   
   // This block listens for the strings "fruit" and "fruits"
@@ -116,7 +116,7 @@ module.exports = function(controller) {
 
   // A function that checks if the string follows a date format.
   // The slash / is the delimiter. The string must have two slashes separating integers.
-  function followsTimeFormat(str, formatStr){
+  function followsDateFormat(str, formatStr){
     var strs = str.split(':'), formatStrs = str.split(':');
     if(strs.length != formatStrs.length)
       return false;
