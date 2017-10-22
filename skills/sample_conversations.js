@@ -4,13 +4,20 @@ In this document, Botkit hears a keyword, then responds. Different paths
 through the conversation are chosen based on the user's response.
 
 */
-/*
+
+// CONVO VARS
 var time = 'Not a time'; // stores the given time
 var date = 'Not a date'; // stores the current date
 var ampm = 'Not a morning person'; // stores morning or evening state
 var occasion = 'A boring one'; // stores the formality level
-const OCCASIONS = ['business', 'coffee', 'educational', 'family', 'food', 'night life', 'romantic', 'shopping', 'travel', 'other']; // list of occasions
+const OCCASIONS = ['business', 'coffee', 'educational', 'family', 'food', 'meet up', 'night life', 'romantic', 'shopping', 'travel', 'other']; // list of occasions
+// PERSON VARS
+var lat = 0; // stores the latitude of the person
+var lon = 0; // stores the longitude of the person
+const AGREEMENTS = ['fill this out plz', 'yes', 'yeah', 'yea', 'y', 'mmhm']; // list of ways people can agree to something
+const FRIENDS = []; // list of friends. empty on init
 
+// BEGINNING OF CONVO
 module.exports = function(controller) {
   // Bot listens for "meet", then requests a time to meet up.
   controller.hears(['meet', 'meeting'], 'message_received', function(bot, message){
@@ -73,139 +80,19 @@ module.exports = function(controller) {
   controller.hears('occasion', 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
       // Bot asks user for occasion. If user not sure, prompt 'other'
-      convo.ask('Please specify the occasion and setting of your group meeting. (formal/informal):', function(response1, convo1){
+      convo.ask('Please specify the occasion and setting of your group meeting:', function(response1, convo1){
         for(var occ in OCCASIONS)
           if(isEqualIgnoreCase(occ, response1.text))
             occasion = response1.text;
         if(isEqual(occasion, 'A boring one'))
           occasion = 'other';
-        convo1.say('You have chosen an occasion of ' + occasion + '. If this is correct, type \"lmao\", otherwise type \"occasion\".');
+        convo1.say('You have chosen an occasion of ' + occasion + '. If this is correct, type \"friends\" or \"group\" to '
+          + 'add other people to your plan. Otherwise, type \"occasion\" to choose another occasion.');
         convo1.next();
       });
       convo.next();
     });
   });
-*/
-module.exports = function(controller);
-var PERSONS;
-var Person = {
-  name: "",
-  sum: 0,
-  lat: null,
-  long: null
-};
-
-// Returns the linear distance between p1 and p2
-export function linDistance(p1, p2){
-  var phi1 = p1.lat, theta1 = p1.long, phi2 = p2.lat, theta2 = p2.long;
-  var distance = Math.sqrt(Math.pow(Math.cos(theta1)*Math.sin(phi1)-Math.cos(theta2)*Math.sin(phi2),2)
-    + Math.pow(Math.sin(theta1)*Math.sin(phi1)-Math.sin(theta2)*Math.sin(phi2),2)
-    + Math.pow(Math.cos(phi1)-Math.cos(phi2),2)
-  );
-  return distance;
-};
-
-// Returns which person has the smaller sum
-export function smallerSum(p1, p2){
-  if(p1.sum < p2.sum)
-    return p1;
-  else
-    return p2;
-};
-
-// PERSON CONSTRUCTOR
-export function makePerson(named, latd, longd){
-  return {
-    name: named,
-    sum: 0,
-    lat: latd,
-    long: longd
-  };
-};
-//export function setSum 
-
-// Returns the aggregate sum of distances between the target and group
-export function findSum(target, group){
-  var sum;
-  for (var other in group) {
-    if(!(other.equals(target))){
-        sum += target.linDistance(target, other);
-    }
-  }
-  return sum;
-};
-
-// Returns the person with the smallest sum in the group
-export function findMinPerson(group){
-  var position = 0;
-  var minPerson = group[0];
-  var index = 0;
-  for(position = 0; position < group.length - 1; position++){
-    var minSum = group[position].sum;
-    for(index = position; index < group.length - 1; ){
-      if(group[index].sum + 1 < group[position].sum){
-        minPerson = group[index + 1];
-        group[index + 1] = group[position];
-        group[position] = minPerson;
-        index = position;
-      }
-      else index++;
-    };
-  };
-  return minPerson;
-};
-
-// Returns whether the two persons are the same
-export function equals(p1, p2){
-  if(p1.name == p2.name && p1.long == p2.long && p2.lat == p2.lat)
-    return true;
-  return false;
-};
-  controller.hears('meetup', 'meet up', 'get together', function(bot, message){
-	bot.startConversation(message, function(err, convo){
-		convo.ask('Would you like to meetup?', function(meetupresp, meetupconvo){
-			for(var yes in AGREEMENTS){
-				if(isEqualIgnoreCase(meetupresp, yes){
-					convo.say('Great!');
-				}
-				else return;
-			}
-		convo.ask('Who would you like to meetup with? (seperate by commas and spaces: John, Alexa, Gary)', function(whoresp, whoconvo){
-			var FRIENDS = whoresp.split(', ');
-		convo.ask('What kind of place would you like to meet up?', function(occasresp, occasconvo){
-			var place = occasresp;
-		}
-		convo.addQuestion({
-			text:"Could you send me your location please?", 
-			quick_replies:[{
-				"content_type":"location",
-			}]
-		}, function(response, convo){
-	           
-		var obj = {
-        		lat: response.attachments[0].payload.coordinates.lat,
-        		lon: response.attachments[0].payload.coordinates.long
-        	}
-			var person = makePerson(message.user,lat,lon);
-			PERSONS.push(person);
-			//while
-			//function for adding other people
-			//waits to proceed until all friends have responded or some time has passed (1 hr?)
-
-		}
-		var index = 0;
-		while(index < FRIENDS.length-1){
-			PERSONS[index].sum = findSum(PERSONS[index], PERSONS);
-			index++;
-		}
-		var targetFriend = findMinPerson(PERSONS);
-
-
-
-	}
-  }
-
-/*
   
   // This block listens for the strings "fruit" and "fruits"
   controller.hears(['fruit', 'fruits'], 'message_received', function(bot, message) {
@@ -241,6 +128,52 @@ export function equals(p1, p2){
       });
     });
   });
+
+  // Bot listens for the string "friends" or "group" and prompts the user to input a list of people separated by commas and spaces
+  controller.hears(['friends', 'group'], function(bot, message){
+    bot.startConversation(message, function(err, convo){
+      /* //COMMENTED OUT BECAUSE FUNCTIONALITY ALREADY ENABLED: SEE TOP. ALSO THERE IS A COMMENTED-OUT "});" AT THE BOTTOM; IT BELONGS TO THIS CHUNK
+      convo.ask('Would you like to meet up?', function(meetupresp, meetupconvo){
+        for(var yes in AGREEMENTS) // TODO: write AGREEMENTS
+          if(isEqualIgnoreCase(meetupresp.text, yes))
+            convo.say('Great!');
+      */
+      // Bot asks user to add friends/group members to the MeetUp plan
+      convo.ask('Who would you like to meet up with? (separate names by a comma and space: \"John, Alexa, Gary\")', function(whoresp, whoconvo){
+        FRIENDS = whoresp.split(', ');
+      });
+      /* //COMMENTED OUT BECAUSE FUNCTIONALITY ALREADY ENABLED: SEE LINE 80ISH.
+      convo.ask('What kind of place would you like to meet up?', function(occasresp, occasconvo){
+        var place = occasresp;
+      });
+      */
+      convo.addQuestion({
+        text: "Could you send me your location please?", 
+        quick_replies:[{ "content_type": "location", }]
+      }, function(response, convo){
+        // location temporarily stores the lat/lon of the user
+        var location = {
+          lat: response.attachments[0].payload.coordinates.lat,
+          lon: response.attachments[0].payload.coordinates.long
+        };
+        var person = makePerson(message.user, location.lat, location.lon);
+        PERSONS.push(person);
+        //while
+        //function for adding other people
+        //waits to proceed until all friends have responded or some time has passed (1 hr?)
+        // TODO: IMPLEMENT THE ABOVE
+      });
+      // could use a for loop on this stuff
+      var index = 0;
+      while(index < FRIENDS.length - 1){
+        PERSONS[index].sum = findSum(PERSONS[index], PERSONS);
+        index++;
+      }
+      var targetFriend = findMinPerson(PERSONS);
+      // TODO: ADD MORE CODE
+    });
+  });
+  //});
   
   // A function that checks if the string follows a time format.
   // The colon : is the delimiter. The string must have a colon separating integers.
@@ -285,5 +218,81 @@ export function equals(p1, p2){
   function isEqualIgnoreCase(str1, str2){
     return str1.toUpperCase() == str2.toUpperCase();
   }
+}
+
+// ALL OF THE BELOW CODE DEFINES THE PERSON SPECS
+
+//module.exports = function(controller){};
+var PERSONS;
+var Person = {
+  name: "",
+  sum: 0,
+  lat: null,
+  long: null
+}
+
+// Returns the linear distance between p1 and p2
+function linDistance(p1, p2){
+  var phi1 = p1.lat, theta1 = p1.long, phi2 = p2.lat, theta2 = p2.long;
+  var distance = Math.sqrt(Math.pow(Math.cos(theta1)*Math.sin(phi1)-Math.cos(theta2)*Math.sin(phi2),2)
+    + Math.pow(Math.sin(theta1)*Math.sin(phi1)-Math.sin(theta2)*Math.sin(phi2),2)
+    + Math.pow(Math.cos(phi1)-Math.cos(phi2),2);
+  );
+  return distance;
+}
+
+// Returns which person has the smaller sum
+function smallerSum(p1, p2){
+  if(p1.sum < p2.sum)
+    return p1;
+  else
+    return p2;
+}
+
+// PERSON CONSTRUCTOR
+function makePerson(named, latd, longd){
+  return {
+    name: named,
+    sum: 0,
+    lat: latd,
+    long: longd
+  };
 };
-*/
+
+// Returns the aggregate sum of distances between the target and group
+function findSum(target, group){
+  var sum;
+  for (var other in group) {
+    if(!(other.equals(target))){
+        sum += target.linDistance(target, other);
+    }
+  }
+  return sum;
+};
+
+// Returns the person with the smallest sum in the group
+function findMinPerson(group){
+  var position = 0;
+  var minPerson = group[0];
+  var index = 0;
+  for(position = 0; position < group.length - 1; position++){
+    var minSum = group[position].sum;
+    for(index = position; index < group.length - 1; ){
+      if(group[index].sum + 1 < group[position].sum){
+        minPerson = group[index + 1];
+        group[index + 1] = group[position];
+        group[position] = minPerson;
+        index = position;
+      }
+      else index++;
+    };
+  };
+  return minPerson;
+};
+
+// Returns whether the two persons are the same
+function equals(p1, p2){
+  if(p1.name == p2.name && p1.long == p2.long && p2.lat == p2.lat)
+    return true;
+  return false;
+}
