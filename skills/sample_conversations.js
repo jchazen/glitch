@@ -272,26 +272,26 @@ module.exports = function(controller) {
         return false;
     return true;
   }
+}
 
-  // A function that tests if the given string is a number
-  function isNumber(str){
-    return !isNaN(parseInt(str));
-  }
+// A function that tests if the given string is a number
+function isNumber(str){
+  return !isNaN(parseInt(str));
+}
 
-  // A function that tests if the given string is a letter
-  function isLetter(str) {
-    return str.length === 1 && str.match(/[a-z]/i);
-  }
+// A function that tests if the given string is a letter
+function isLetter(str) {
+  return str.length === 1 && str.match(/[a-z]/i);
+}
 
-  // A function that tests if two strings are equal
-  function isEqual(str1, str2){
-    return str1 == str2;
-  }
+// A function that tests if two strings are equal
+function isEqual(str1, str2){
+  return str1 == str2;
+}
 
-  // A function that tests if two String objects are equal
-  function isEqualIgnoreCase(str1, str2){
-    return str1.toUpperCase() == str2.toUpperCase();
-  }
+// A function that tests if two String objects are equal
+function isEqualIgnoreCase(str1, str2){
+  return str1.toUpperCase() == str2.toUpperCase();
 }
 
 // ALL OF THE BELOW CODE DEFINES THE PERSON SPECS
@@ -311,7 +311,7 @@ function linDistance(p1, p2){
   var phi1 = p1.lat, theta1 = p1.long, phi2 = p2.lat, theta2 = p2.long;
   var distance = Math.sqrt(Math.pow(Math.cos(theta1)*Math.sin(phi1)-Math.cos(theta2)*Math.sin(phi2),2)
     + Math.pow(Math.sin(theta1)*Math.sin(phi1)-Math.sin(theta2)*Math.sin(phi2),2)
-    + Math.pow(Math.cos(phi1)-Math.cos(phi2),2);
+    + Math.pow(Math.cos(phi1)-Math.cos(phi2),2)
   );
   return distance;
 }
