@@ -46,7 +46,7 @@ module.exports = function(controller) {
                   convo4.say()
                 }
                 // Bot asks user if inputted information is correct. If not, redo; if so, 
-                convo4.ask('Ok. So you want to meet on this date ' + date + ', at this time ' + time + ampm + '. Is this correct?', function(response5, convo5){
+                convo4.ask('Ok. So you want to meet on ' + date + ' at ' + time + ampm + '. Is this correct?', function(response5, convo5){
                   // COMPARES response5.text as "yes" or "no" to determine if location should be sent
                   if(response5.text == 'yes'){
                     convo5.say('Great! I\'ll let you know which places you and your group should meet at soon!');
@@ -90,13 +90,13 @@ module.exports = function(controller) {
               convo2.say('Wow, I like ' + response2.text + ' too!');
             else
               convo2.say('I don\;t know that brand. I bet that ' + response2.text + ' orange juice tastes good though.');
+            convo2.next();
           });
         } else if(isEqual(response1.text, 'banana')){
           convo1.say('BANANAS. GOOD CHOICE.');
         } else{
           convo1.say('You\'re avoiding the question.');
         }
-
         convo1.next();
       });
     });
