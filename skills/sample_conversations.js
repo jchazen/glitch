@@ -11,10 +11,6 @@ var date = 'Not a date'; // stores the current date
 var ampm = 'Not a morning person'; // stores morning or evening state
 
 module.exports = function(controller) {
-	console.log('  Comparing \'a string\' and \'a string\': ' + isEqual('a string', 'a string'));
-    console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
-    console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualString('a string', 'a string'));
-    console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualString('a string', 'another string'));
   // Bot listens for "meet", then requests a time to meet up.
   controller.hears(['meet', 'meeting'], 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
@@ -74,6 +70,10 @@ module.exports = function(controller) {
   // This block listens for the strings "fruit" and "fruits"
   controller.hears(['fruit', 'fruits'], 'message_received', function(bot, message) {
     bot.startConversation(message, function(err, convo) {
+      console.log('  Comparing \'a string\' and \'a string\': ' + isEqual('a string', 'a string'));
+      console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualString('a string', 'a string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualString('a string', 'another string'));
       // Asks the user a question
       convo.ask('Which do you like the best out of apple, orange, and banana?', function(response1, convo1) {
         if(isEqual(response1.text, 'apple')){
