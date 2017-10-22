@@ -74,6 +74,8 @@ module.exports = function(controller) {
       console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
       console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualString('a string', 'a string'));
       console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualString('a string', 'another string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualStringIgnoreCase('a string', 'a string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualStringIgnoreCase('a string', 'another string'));
       // Asks the user a question
       convo.ask('Which do you like the best out of apple, orange, and banana?', function(response1, convo1) {
         if(isEqual(response1.text, 'apple')){
@@ -145,4 +147,18 @@ module.exports = function(controller) {
     return str1 == str2;
   }
   
+  // A function that tests if two String objects are equal
+  function isEqualString(str1, str2){
+    var string1 = new String(str1);
+    var string2 = new String(str2);
+    return string1.equals(string2);
+  }
+
+  // A function that tests if two String objects are equal, regardless of case
+  function isEqualStringIgnoreCase(str1, str2){
+    var string1 = new String(str1);
+    var string2 = new String(str2);
+    return string1.equalsIgnoreCase(string2);
+  }
+
 };
