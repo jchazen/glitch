@@ -21,6 +21,9 @@ var PERSONS = []; // list of people going to meet up. independent of user
 var person; // the current person
 var targetFriend; // person who made the plan first
 const RADIUS = 30; // number of miles away from targetFriend that google maps should search for places
+// LOC_REQUEST VARS
+var Store = require("jfs");
+var db = new Store("./my-folder/datab.json");
 
 // BEGINNING OF CONVO
 module.exports = function(controller) {
@@ -269,7 +272,7 @@ module.exports = function(controller) {
 
   // listen for the phrase `shirt` and reply back with structured messages
   // containing images, links and action buttons
-  controller.hears(['let\'s go!', 'leggo'], 'message_received', function(bot, message){
+  controller.hears(['let\'s go', 'leggo'], 'message_received', function(bot, message){
     //start conversation after hearing key word
     bot.startConversation(message, function(err, convo){
       convo.addQuestion({
@@ -370,7 +373,7 @@ function makePerson(named, latd, longd){
     lat: latd,
     long: longd
   };
-};
+}
 
 // Returns the aggregate sum of distances between the target and group
 function findSum(target, group){
@@ -381,7 +384,7 @@ function findSum(target, group){
     }
   }
   return sum;
-};
+}
 
 // Returns the person with the smallest sum in the group and sorts group in ascending order
 function findMinPerson(group){
@@ -401,7 +404,7 @@ function findMinPerson(group){
     };
   };
   return minPerson;
-};
+}
 
 // Returns an array without the person that was just removed
 function removePerson(name, group){
