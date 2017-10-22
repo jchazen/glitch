@@ -289,7 +289,7 @@ module.exports = function(controller) {
         db.save(message.user, JSON.stringify(obj));
         
         bot.reply(message, 'You are at ' + obj.lat + ', ' + obj.lon);
-        bot.reply(message, 'Let's explore!')
+        bot.reply(message, 'Let\'s explore!');
         
       },{key: 'location'}, 'default');
     });
