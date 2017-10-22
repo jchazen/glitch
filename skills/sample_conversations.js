@@ -288,7 +288,7 @@ function isEqualIgnoreCase(str1, str2){ return str1.toUpperCase() == str2.toUppe
 
 // ALL OF THE BELOW CODE DEFINES THE PERSON SPECS
 
-//module.exports = function(controller){};
+module.exports = function(controller){};
 /*
 var Person = {
   name: "", // The name of the person
