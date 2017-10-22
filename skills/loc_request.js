@@ -2,7 +2,7 @@
 
 Botkit Studio Skill module to enhance the "send location" script
 NEW?
-*/
+
 
 
 //var database = new Store('./my-folder/dataBB.json');
@@ -26,10 +26,10 @@ var db = new Store("./my-folder/datab.json");
         }]
       }, function(response, convo){
          
-        //parsing laditude and longitude based on user location
+        //parsing latitude and longitude based on user location
         var obj = {
-        lat: response.attachments[0].payload.coordinates.lat,
-        lon: response.attachments[0].payload.coordinates.long
+          lat: response.attachments[0].payload.coordinates.lat,
+          lon: response.attachments[0].payload.coordinates.long
         }
         console.log("Looks like user " + message.user + " is at: "+ JSON.stringify(obj));
 
@@ -47,8 +47,6 @@ var db = new Store("./my-folder/datab.json");
     });
     
   });
-  
-  //controller.hears('i\'m hungry')
 
- 
-  };
+};
+*/
