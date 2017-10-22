@@ -74,10 +74,10 @@ module.exports = function(controller) {
       console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
       console.log('  Comparing \'a string\' and \'a string\': ' + isIdentical('a string', 'a string'));
       console.log('  Comparing \'a string\' and \'another string\': ' + isIdentical('a string', 'another string'));
-      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualString('a string', 'a string'));
-      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualString('a string', 'another string'));
-      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualStringIgnoreCase('a string', 'a string'));
-      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualStringIgnoreCase('a string', 'another string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isEqualIgnoreCase('a string', 'a string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isEqualIgnoreCase('a string', 'another string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'a string\'): ' + isIdenticalIgnoreCase('a string', 'a string'));
+      console.log('  Comparing new String(\'a string\') and new String(\'another string\'): ' + isIdenticalIgnoreCase('a string', 'another string'));
       // Asks the user a question
       convo.ask('Which do you like the best out of apple, orange, and banana?', function(response1, convo1) {
         if(isEqual(response1.text, 'apple')){
@@ -155,12 +155,12 @@ module.exports = function(controller) {
   }
   
   // A function that tests if two String objects are equal
-  function isEqualString(str1, str2){
-    return str1.equals(str2);
+  function isEqualIgnoreCase(str1, str2){
+    return str1.toUpperCase() == str2.toUpperCase();
   }
 
   // A function that tests if two String objects are equal, regardless of case
-  function isEqualStringIgnoreCase(str1, str2){
+  function isIdenticalIgnoreCase(str1, str2){
     return str1.equalsIgnoreCase(str2);
   }
 
