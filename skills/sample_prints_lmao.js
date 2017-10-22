@@ -1,3 +1,4 @@
+/*
 console.log('  Comparing \'a string\' and \'a string\': ' + isEqual('a string', 'a string'));
 console.log('  Comparing \'a string\' and \'another string\': ' + isEqual('a string', 'another string'));
 console.log('  Comparing \'A string\' and \'a string\': ' + isEqual('A string', 'a string'));
@@ -34,3 +35,4 @@ function isEqualIgnoreCase(str1, str2){
 function isIdenticalIgnoreCase(str1, str2){
   return str1.toUpperCase() === str2.toUpperCase();
 }
+*/

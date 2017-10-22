@@ -65,7 +65,7 @@ require("fs").readdirSync(normalizedPath).forEach(function(file) {
 // You can tie into the execution of the script using the functions
 // controller.studio.before, controller.studio.after and controller.studio.validate
 if (process.env.studio_token) {
-  console.log('WTF');
+  console.log('Bot.js is now running.');
     controller.on('message_received,facebook_postback', function(bot, message) {
         if (message.text) {
             controller.studio.runTrigger(bot, message.text, message.user, message.channel, message).then(function(convo) {

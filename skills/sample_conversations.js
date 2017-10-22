@@ -248,51 +248,43 @@ module.exports = function(controller) {
       //places_suggestions.
     });
   });
+}
 
-  // A function that checks if the string follows a time format.
-  // The colon : is the delimiter. The string must have a colon separating integers.
-  function followsTimeFormat(str, formatStr){
-    var strs = str.split(':'), formatStrs = str.split(':');
-    if(strs.length != formatStrs.length)
+// A function that checks if the string follows a time format.
+// The colon : is the delimiter. The string must have a colon separating integers.
+function followsTimeFormat(str, formatStr){
+  var strs = str.split(':'), formatStrs = str.split(':');
+  if(strs.length != formatStrs.length)
+    return false;
+  for(var i = 0; i < strs.length; i++)
+    if(parseInt(strs[i]) > parseInt(formatStrs[i]))
       return false;
-    for(var i = 0; i < strs.length; i++)
-      if(parseInt(strs[i]) > parseInt(formatStrs[i]))
-        return false;
-    return true;
-  }
+  return true;
+}
 
-  // A function that checks if the string follows a date format.
-  // The slash / is the delimiter. The string must have two slashes separating integers.
-  function followsDateFormat(str, formatStr){
-    var strs = str.split(':'), formatStrs = str.split(':');
-    if(strs.length != formatStrs.length)
+// A function that checks if the string follows a date format.
+// The slash / is the delimiter. The string must have two slashes separating integers.
+function followsDateFormat(str, formatStr){
+  var strs = str.split(':'), formatStrs = str.split(':');
+  if(strs.length != formatStrs.length)
+    return false;
+  for(var i = 0; i < strs.length; i++)
+    if(parseInt(strs[i]) > parseInt(formatStrs[i]))
       return false;
-    for(var i = 0; i < strs.length; i++)
-      if(parseInt(strs[i]) > parseInt(formatStrs[i]))
-        return false;
-    return true;
-  }
+  return true;
 }
 
 // A function that tests if the given string is a number
-function isNumber(str){
-  return !isNaN(parseInt(str));
-}
+function isNumber(str){ return !isNaN(parseInt(str)); }
 
 // A function that tests if the given string is a letter
-function isLetter(str) {
-  return str.length === 1 && str.match(/[a-z]/i);
-}
+function isLetter(str) { return str.length === 1 && str.match(/[a-z]/i); }
 
 // A function that tests if two strings are equal
-function isEqual(str1, str2){
-  return str1 == str2;
-}
+function isEqual(str1, str2){ return str1 == str2; }
 
 // A function that tests if two String objects are equal
-function isEqualIgnoreCase(str1, str2){
-  return str1.toUpperCase() == str2.toUpperCase();
-}
+function isEqualIgnoreCase(str1, str2){ return str1.toUpperCase() == str2.toUpperCase(); }
 
 // ALL OF THE BELOW CODE DEFINES THE PERSON SPECS
 
