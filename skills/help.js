@@ -12,6 +12,13 @@ module.exports = function(controller) {
             if (convo.hasThread(matches[1])) {
                 convo.gotoThread(matches[1]);
             }
+        } else {
+            convo.say('New user? Forgot how to talk to me? Here are some things that might jog your memory: \n' +
+                'Ask me to \"meet\" if you want to plan a group meeting! \n' +
+                'Tell me about a \"fruit\"! \n' +
+                'Want to \"find\" your friend\'s group meeting? \n' +
+                'Need to confirm your location? Then \"let\'s go\"! \n' +
+                'Just want to say \"hello\"?');
         }
 
         next();
