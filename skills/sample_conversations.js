@@ -9,7 +9,7 @@ through the conversation are chosen based on the user's response.
 var time = 'Not a time'; // stores the given time
 var date = 'Not a date'; // stores the current date
 var ampm = 'Not a morning person'; // stores morning or evening state
-var occasion = 'A boring one'; // stores the formality level
+var occasion = 'You have input an invalid occasion.'; // stores the formality level or occasion
 const OCCASIONS = ['business', 'coffee', 'educational', 'family', 'food', 'meet up', 'night life', 'romantic', 'shopping', 'travel', 'other']; // list of occasions
 // PERSON VARS
 var lat = 0; // stores the latitude of the person
@@ -90,13 +90,14 @@ module.exports = function(controller) {
   controller.hears('occasion', 'message_received', function(bot, message){
     bot.startConversation(message, function(err, convo){
       // Bot asks user for occasion. If user not sure, prompt 'other'
-      convo.ask('Please specify the occasion and setting of your group meeting:', function(response1, convo1){
-        for(var occ in OCCASIONS)
-          if(isEqualIgnoreCase(occ, response1.text))
-            occasion = response1.text;
-        if(isEqual(occasion, 'A boring one'))
-          occasion = 'other';
-        convo1.say('You have chosen an occasion of ' + occasion + '. If this is correct, type \"friend\" or \"group\" to '
+      convo.ask('Please specify the occasion or setting of your group meeting:', function(response1, convo1){
+        for(var occ in OCCASIONS){
+          if(isEqualIgnoreCase(occ, response1.text)){
+            occasion = 'You have selected an occasion of ' + response1.text;
+            break;
+          }
+        }
+        convo1.say(occasion + ' If this is correct, type \"friend\" or \"group\" to '
           + 'add other people to your plan. Otherwise, type \"occasion\" to choose another occasion.');
         convo1.next();
       });
@@ -327,7 +328,7 @@ function followsDateFormat(str, formatStr){
 function isNumber(str){ return !isNaN(parseInt(str)); }
 
 // A function that tests if the given string is a letter
-function isLetter(str) { return str.length === 1 && str.match(/[a-z]/i); }
+function isLetter(str){ return str.length === 1 && str.match(/[a-z]/i); }
 
 // A function that tests if two strings are equal
 function isEqual(str1, str2){ return str1 == str2; }
@@ -410,7 +411,7 @@ function findMinPerson(group){
 function removePerson(name, group){
   var temp = group[0];
   for(var i = 1; i < group.length; i++){
-    if(isEqual(group[i], name)){
+    if(isEqualIgnoreCase(group[i], name)){
       group[i] = temp;
       group[0] = name;
     }
@@ -430,25 +431,25 @@ function equals(p1, p2){
 function makeFakePersons(){
   return {
     p1: {
-      name: 'Jacob',
+      name: 'Jacob', //at computer lab
       sum: 2.1, //0.8+0.3+1.0,
       lat: 32.881794,
       lon: -117.233410
     },
     p2: {
-      name: 'Michael',
+      name: 'Michael', //at keeling
       sum: 2.7, //1.0+0.7+1.0,
       lat: 32.873969,
       lon: -117.242955
     },
     p3: {
-      name: 'Tiffany',
+      name: 'Tiffany', //at geisel
       sum: 1.7, //0.7+0.3+0.7,
       lat: 32.881122,
       lon: -117.237604
     },
     p4: {
-      name: 'Caitlyn',
+      name: 'Caitlyn', //at bistro
       sum: 2.5, //1.0+0.8+0.7,
       lat: 32.886089, 
       lon: -117.242760
